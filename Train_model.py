@@ -31,13 +31,12 @@ print("=" * 60)
 print("  SOCIAL MEDIA ADDICTION - MODEL TRAINING")
 print("=" * 60)
 
-# ── 1. Load ──────────────────────────────────────────────────
+
 print("\n[1] Loading dataset...")
 df = pd.read_csv("ClassSurvey.csv")
 print(f"    Rows: {len(df)}  |  Columns: {len(df.columns)}")
 print(f"    Columns: {list(df.columns)}")
 
-# ── 2. Select features ────────────────────────────────────────
 print("\n[2] Preparing features...")
 
 DROP_COLS = [
@@ -55,7 +54,7 @@ print(f"    Feature columns: {FEATURE_COLS}")
 X = df[FEATURE_COLS].copy()
 y = df[TARGET_COL].copy()
 
-# Encode: Addicted=1, Not Addicted=0
+
 y_encoded = (y == 'Addicted').astype(int)
 
 X = X.fillna(X.mean())
@@ -64,7 +63,7 @@ print(f"\n    Target distribution:")
 for label, cnt in y.value_counts().items():
     print(f"      {label}: {cnt} students ({cnt/len(y)*100:.1f}%)")
 
-# ── 3. Split & Scale ──────────────────────────────────────────
+#3. Split and scale data
 print("\n[3] Splitting & scaling data...")
 X_train, X_test, y_train, y_test = train_test_split(
     X, y_encoded, test_size=0.2, random_state=123, stratify=y_encoded
@@ -76,13 +75,13 @@ X_test_s  = scaler.transform(X_test)
 
 print(f"    Train: {len(X_train)}  |  Test: {len(X_test)}")
 
-# ── 4. Train ──────────────────────────────────────────────────
+# 4. Train model 
 print("\n[4] Training Logistic Regression...")
 model = LogisticRegression(max_iter=1000, random_state=123, C=1.0)
 model.fit(X_train_s, y_train)
 print("    ✓ Model trained")
 
-# ── 5. Evaluate ───────────────────────────────────────────────
+# 5. Evaluate model 
 print("\n[5] Evaluating model...")
 
 y_pred       = model.predict(X_test_s)

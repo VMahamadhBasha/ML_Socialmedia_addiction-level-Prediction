@@ -1,0 +1,99 @@
+1. What the model learns
+Training data
+Input features: daily usage minutes for apps such as:
+WhatsApp, Instagram, Snapchat, Telegram, Facebook
+BeReal, TikTok, WeChat, Twitter, LinkedIn, Messages
+Target label:
+SocialMediaAddiction
+Encoded as: Addicted = 1, Not Addicted = 0
+Preprocessing
+Before training, the data is prepared like this:
+
+Missing values are filled with the column mean
+Data is split into:
+80% training
+20% testing
+Features are scaled using StandardScaler
+This converts each feature to zero mean and unit variance
+Required because logistic regression works better when features are on the same scale
+2. The algorithm: Logistic Regression
+How it works
+Logistic regression builds a model of the form:
+
+score = intercept + w1*x1 + w2*x2 + ... + wn*xn
+
+Where:
+
+xi = normalized value for each platform usage
+wi = learned coefficient for that feature
+intercept = model bias term
+Then it converts the score to probability using the sigmoid function:
+
+probability = 1 / (1 + exp(-score))
+
+Meaning of the output
+probability is the model’s confidence that the user is Addicted
+If probability >= 0.5 → prediction = Addicted
+If probability < 0.5 → prediction = Not Addicted
+3. How prediction is done in your project
+Training script: Train_model.py
+This script:
+
+Loads ClassSurvey.csv
+Builds feature matrix X and label y
+Scales the features
+Trains LogisticRegression
+Evaluates accuracy, ROC-AUC, confusion matrix
+Saves:
+model.pkl
+scaler
+feature order
+Production server: App.py
+When the app receives a prediction request:
+
+It reads JSON input values
+Builds the feature vector in the exact same order used during training
+Applies the saved StandardScaler
+Calls:
+model.predict(...)
+model.predict_proba(...)
+Returns:
+prediction (Addicted or Not Addicted)
+confidence
+addicted_prob
+not_addicted_prob
+total_mins
+total_hrs
+4. How the prediction request flows
+Example flow
+User enters values in the form
+Frontend sends a POST request to http://localhost:5000/predict
+Backend:
+reads values
+scales them
+predicts class
+returns probability output
+Frontend shows the result
+5. Why scaling matters
+Without scaling,
+
+features like WhatsApp 120 min and Messages 20 min would be treated differently by magnitude
+StandardScaler ensures each app usage is comparable
+training becomes more stable and meaningful
+6. What the result means
+If the model predicts Addicted:
+
+it means the combination of app usages matches patterns from the training data labeled as addicted
+the model is using all usage values together, not just one app
+If it predicts Not Addicted:
+
+the total usage and pattern look more similar to healthy users in the dataset
+7. Important note
+Your current frontend HTML also contains a separate JavaScript-based scoring rule using fixed weights and a threshold. But the real trained ML model is in:
+
+Train_model.py
+App.py
+model.pkl
+If you want, I can also explain exactly how the frontend differs from the backend model and help you connect the HTML UI to the real Flask /predict API.
+
+Raptor mini (Preview) • 1x
